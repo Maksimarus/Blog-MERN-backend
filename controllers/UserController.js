@@ -2,7 +2,7 @@ import {validationResult} from 'express-validator';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 
-import UserSchema from '../models/User.js';
+import UserModel from '../models/User.js';
 
 class UserController {
   async register(req, res) {
@@ -16,7 +16,7 @@ class UserController {
       const salt = await bcrypt.genSalt(10);
       const hash = await bcrypt.hash(password, salt);
 
-      const doc = new UserSchema({
+      const doc = new UserModel({
         fullName: req.body.fullName,
         email: req.body.email,
         avatarUrl: req.body.avatarUrl,
@@ -49,7 +49,7 @@ class UserController {
   }
   async login(req, res) {
     try {
-      const user = await UserSchema.findOne({email: req.body.email});
+      const user = await UserModel.findOne({email: req.body.email});
       if (!user) {
         return res.status(404).json({
           message: 'Пользователь не найден',
@@ -86,7 +86,7 @@ class UserController {
   }
   async getMe(req, res) {
     try {
-      const user = await UserSchema.findById(req.userId);
+      const user = await UserModel.findById(req.userId);
       if (!user) {
         return res.status(404).json({
           message: 'Пользователь не найден',
