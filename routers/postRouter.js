@@ -10,6 +10,6 @@ postRouter.get('/posts', PostController.getAll);
 postRouter.get('/posts/:id', PostController.getOne);
 postRouter.post('/posts', checkAuth, postCreateValidation, PostController.create);
 // postRouter.patch('/posts/:id', checkAuth, PostController.update);
-// postRouter.delete('/posts/:id', checkAuth, PostController.delete);
+postRouter.delete('/posts/:id', checkAuth, PostController.delete);
 
 export default postRouter;

@@ -17,7 +17,9 @@ class PostService {
     return posts;
   }
   async getOne(id) {
-    // const post = await PostModel.findById(id).populate('user').exec();
+    if (!id) {
+      throw new Error('ID не указан');
+    }
     const post = await PostModel.findOneAndUpdate(
       {
         _id: id,
@@ -28,11 +30,21 @@ class PostService {
       {
         returnDocument: 'after',
       },
-    );
+    )
+      .populate('user')
+      .exec();
     if (!post) {
       throw new Error('Статья не найдена');
     }
     return post;
+  }
+  async delete(id) {
+    if (!id) {
+      throw new Error('ID не указан');
+    }
+    await PostModel.findOneAndDelete({
+      _id: id,
+    });
   }
 }
 

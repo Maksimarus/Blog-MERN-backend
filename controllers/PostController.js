@@ -40,7 +40,16 @@ class PostController {
   }
   async delete(req, res) {
     try {
-    } catch (error) {}
+      await PostService.delete(req.params.id);
+      res.json({
+        message: 'Пост успешно удален',
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: 'Не удалось удалить статью',
+      });
+    }
   }
 }
 
