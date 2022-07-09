@@ -1,17 +1,6 @@
 import PostService from '../services/PostService.js';
 
 class PostController {
-  async create(req, res) {
-    try {
-      const post = await PostService.create(req);
-      res.json(post);
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({
-        message: 'Не удалось создать статью',
-      });
-    }
-  }
   async getAll(req, res) {
     try {
       const posts = await PostService.getAll();
@@ -34,13 +23,51 @@ class PostController {
       });
     }
   }
+  async create(req, res) {
+    try {
+      const post = await PostService.create({
+        title: req.body.title,
+        text: req.body.text,
+        tags: req.body.tags,
+        imageUrl: req.body.imageUrl,
+        user: req.userId,
+      });
+      res.json(post);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: 'Не удалось создать статью',
+      });
+    }
+  }
   async update(req, res) {
     try {
-    } catch (error) {}
+      await PostService.update({
+        id: req.params.id,
+        title: req.body.title,
+        text: req.body.text,
+        tags: req.body.tags,
+        imageUrl: req.body.imageUrl,
+        user: req.userId,
+      });
+      res.json({
+        message: 'Пост успешно обновлен',
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: 'Не удалось обновить статью',
+      });
+    }
   }
   async delete(req, res) {
     try {
-      await PostService.delete(req.params.id);
+      const post = await PostService.delete(req.params.id);
+      if (!post) {
+        return res.status(404).json({
+          message: 'Такой статьи нет',
+        });
+      }
       res.json({
         message: 'Пост успешно удален',
       });

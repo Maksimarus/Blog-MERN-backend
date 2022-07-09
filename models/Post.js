@@ -10,7 +10,10 @@ const PostModel = mongoose.Schema(
       type: String,
       required: true,
     },
-    tags: String,
+    tags: {
+      type: Array,
+      default: [],
+    },
     viewsCount: {
       type: Number,
       default: 0,

@@ -1,29 +1,21 @@
-import {validationResult} from 'express-validator';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 
-import UserModel from '../models/User.js';
+import UserService from '../services/UserService.js';
 
 class UserController {
   async register(req, res) {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json(errors.array());
-      }
-
       const password = req.body.password;
       const salt = await bcrypt.genSalt(10);
       const hash = await bcrypt.hash(password, salt);
 
-      const doc = new UserModel({
+      const user = await UserService.createNew({
         fullName: req.body.fullName,
         email: req.body.email,
         avatarUrl: req.body.avatarUrl,
         passwordHash: hash,
       });
-
-      const user = await doc.save();
       const {passwordHash, ...userData} = user._doc;
 
       const token = jwt.sign(
@@ -49,7 +41,7 @@ class UserController {
   }
   async login(req, res) {
     try {
-      const user = await UserModel.findOne({email: req.body.email});
+      const user = await UserService.login({email: req.body.email});
       if (!user) {
         return res.status(404).json({
           message: 'Пользователь не найден',
@@ -86,7 +78,7 @@ class UserController {
   }
   async getMe(req, res) {
     try {
-      const user = await UserModel.findById(req.userId);
+      const user = await UserService.getMe(req.userId);
       if (!user) {
         return res.status(404).json({
           message: 'Пользователь не найден',

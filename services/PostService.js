@@ -1,17 +1,6 @@
 import PostModel from '../models/Post.js';
 
 class PostService {
-  async create(req) {
-    const doc = new PostModel({
-      title: req.body.title,
-      text: req.body.text,
-      tags: req.body.tags,
-      imageUrl: req.body.imageUrl,
-      user: req.userId,
-    });
-    const post = await doc.save();
-    return post;
-  }
   async getAll() {
     const posts = await PostModel.find().populate('user').exec();
     return posts;
@@ -20,10 +9,8 @@ class PostService {
     if (!id) {
       throw new Error('ID не указан');
     }
-    const post = await PostModel.findOneAndUpdate(
-      {
-        _id: id,
-      },
+    const post = await PostModel.findByIdAndUpdate(
+      id,
       {
         $inc: {viewsCount: 1},
       },
@@ -38,13 +25,22 @@ class PostService {
     }
     return post;
   }
+  async create(post) {
+    const createdPost = await PostModel.create(post);
+    return createdPost;
+  }
+  async update(post) {
+    if (!post.id) {
+      throw new Error('ID не указан');
+    }
+    await PostModel.findByIdAndUpdate(post.id, post, {new: true});
+  }
   async delete(id) {
     if (!id) {
       throw new Error('ID не указан');
     }
-    await PostModel.findOneAndDelete({
-      _id: id,
-    });
+    const post = await PostModel.findByIdAndDelete(id);
+    return post;
   }
 }
 
